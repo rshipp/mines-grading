@@ -1,0 +1,7 @@
+#!/bin/bash
+nextToGrade=`ungraded.sh | head -n 1`
+if [[ -h "$nextToGrade.txt" ]];
+then
+    nextToGrade=`find . -type l -iname "*$nextToGrade.txt" -printf "%l\n" | sed "s/\.txt$//"`
+fi
+echo "$nextToGrade"

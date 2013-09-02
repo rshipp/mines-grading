@@ -1,0 +1,8 @@
+#!/bin/bash
+if [[ $# -ne "1" ]];
+then
+    echo "Please provide a full point value" 1>&2
+    exit 1
+fi
+
+grep -P "Total\s*\d*(?<!$1)$" *.txt | sed 's/\(.*\)\.txt.*/\1/' | sed '/^Rubric$/d'

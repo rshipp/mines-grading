@@ -1,0 +1,2 @@
+#!/bin/bash
+find . -regextype posix-extended -regex "\./.*_`nextToGrade`_attempt_.*_.*.*"
