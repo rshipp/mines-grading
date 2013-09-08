@@ -4,6 +4,7 @@ Desperately needing documentation.
 General Usage
 -----
 // TODO document arguments needed for scripts
+
 1. Download zipped collection of students files.
 2. Run `unzip.py` to extract user directories and name them accordingly
 3. Create a `Rubric.txt` with the general format:
