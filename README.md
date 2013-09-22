@@ -1,36 +1,34 @@
-Desperately needing documentation.
+file management
+-------------
+The intent of this subdirectory is for utilties for dealing with submissions
+that have originated from black board (TODO possibly rename to black board?)
+
+usernames
+---------
+Some helpful utilities for translating usernames and for generating a list of
+usernames present
+
+late
+---------
+For finding late submissions
+
+automate
 -----
+For automating the actual grading process. Since often this process will vary
+wildly by class/semester the folders are intially broken down by class (subject)
+and may possibly be further broken down into semester.
 
-General Usage
------
-// TODO document arguments needed for scripts
+eclipse
+---------
+Some general utilities for dealing with submissions in the form of eclipse
+projects
 
-1. Download zipped collection of students files.
-2. Run `unzip.py` to extract user directories and name them accordingly
-3. Create a `Rubric.txt` with the general format:
+rubric
+----------
+This directory really contains a general, class agnositic framework to grading
+that heavily relies on the fact that you are running a \*nix platform
 
-	```
-	Item1            3
-	Item2          2.3
-	Item3            4
-	==================
-	Total 
-	```
-
-	A couple things to notice about the file format
-	1. Items are separted from numbers with at least one space (TODO not sure if
-	   tabs are okay?)
-	2. Items are separated from total line with = equals
-	3. Total line should be left blank as it will be populated later
-
-4. Run `generateRubric.py`.  This will create rubrics for each of the students
-   in the form of `username.txt`
-
-
-Other scripts
--------
-TODO
-
-feel free to document here
-
-
+etc
+----------
+For current lack of a better place to put things.  This folder really just
+contains general, and hopefully helpful utilities
