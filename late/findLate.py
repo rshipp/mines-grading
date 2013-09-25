@@ -23,7 +23,7 @@ timeformat = "%Y-%m-%d-%H-%M-%S"
 secs_in_day = 86400
 
 if not len(sys.argv) == 4:
-    print "Usage: ./script duedate directory prestring"
+    print ("Usage: ./script duedate directory prestring")
     sys.exit(1)
 else:
     prestring = sys.argv[3]
@@ -35,8 +35,8 @@ for each in os.listdir( directory ):
         usernames[getUsername(each)] = time.strptime( getTime( each,prestring ), timeformat )
 
 
-print "Late Submissions"
+print ("Late Submissions")
 for key in usernames:
     if usernames[key] > duedate:
         dayslate = math.ceil((time.mktime( usernames[ key ] ) - time.mktime( duedate ) ) / float(secs_in_day ))
-        print key,": ",time.strftime( timeformat, usernames[key] ),"[",dayslate,"days late]"
+        print (key,": ",time.strftime( timeformat, usernames[key] ),"[",dayslate,"days late]")
