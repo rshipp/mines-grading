@@ -1,0 +1,72 @@
+#!/bin/bash
+# unit4 autograder helper script
+# usage:
+#     ./gradehelper-u04 username
+
+[[ -z $1 ]] && exit 1
+cd $1
+
+main() {
+  # Link and update the git repo
+  ln -sv `pwd`/../../03/$1/* repo
+  echo `pwd`/../../03/$1/* repo
+  cd repo
+  git pull
+
+  # cd to unit04
+  cd *nit*4 || cd src || cd *446/src || die "`ls`"
+  # again, just in case there are two levels
+  cd *nit*4 || echo ignoring error
+
+
+  # run rails to check the rest
+  israilsdir || exit 1
+  # byebug dies on 1.9.3, chuck it
+  sed -i 's/^\(.*byebug\)/#\1/' Gemfile
+  # make sure there's a secrets file.
+  [[ -f config/secrets.yml ]] || cat > config/secrets.yml << EOF
+development:
+  secret_key_base: 3b7cd727ee24e8444053437c36cc66c3
+  some_api_key: SOMEKEY
+EOF
+
+  # set up signal handler
+  trap int_handler INT
+
+  rails server -d || fixrails || exit 1
+  xdg-open http://localhost:3000/
+
+  # wait for interrupt
+  while :; do sleep 1; done
+}
+
+
+int_handler() {
+  echo "Interrupt detected, shutting down."
+  # check date
+  echo '==> Check the date!'
+  git log|grep Date:|head -1
+
+  # kill rails
+  killall ruby; sleep 0.5
+  killall -9 ruby
+
+  exit
+}
+
+die() {
+  echo Can\'t continue. :\(
+  echo "$1"
+}
+
+israilsdir() {
+  [[ -e app ]]
+}
+
+fixrails() {
+  bundle install
+  rails server -d || (echo Rails won\'t start.; exit 1)
+}
+
+# Run
+main $1

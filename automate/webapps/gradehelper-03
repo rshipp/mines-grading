@@ -1,0 +1,72 @@
+#!/bin/bash
+# unit3 autograder helper script
+# usage:
+#     ./gradehelper-u03 username
+
+[[ -z $1 ]] && exit 1
+cd $1
+
+main() {
+  # Clone the git repo
+  read -p "Git remote: " remote
+  git clone --recursive $remote
+  cd $(basename ${remote/.git})
+
+  # cd to unit03
+  cd *nit*3 || cd src || cd *446/src || die "`ls`"
+  # again, just in case there are two levels
+  cd *nit*3 || echo ignoring error
+
+  # check for some requirements
+  echo "==> Render"
+  grep -r1 render app || missing partial
+  echo "==> Flash"
+  grep -r1 flash app || missing flash
+  echo "==> Date from controller"
+  grep -r1 [dD]ate app || missing date
+  echo "==> Hash passed in"
+  grep -r1 [hH]ash app || grep -r1 '= {' app || missing hash
+
+  # run rails to check the rest
+  israilsdir || exit 1
+  # byebug dies on 1.9.3, chuck it
+  sed -i 's/^\(.*byebug\)/#\1/' Gemfile
+  # make sure there's a secrets file.
+  [[ -f config/secrets.yml ]] || cat > config/secrets.yml << EOF
+development:
+  secret_key_base: 3b7cd727ee24e8444053437c36cc66c3
+  some_api_key: SOMEKEY
+EOF
+  rails server -d || fixrails || exit 1
+  xdg-open http://localhost:3000/course/announce
+  xdg-open http://localhost:3000/course/eval
+  xdg-open http://localhost:3000/course/scores
+  sleep 0.5
+  killall ruby; sleep 0.5
+  killall -9 ruby
+  
+  # check date
+  echo '==> Check the date!'
+  git log|grep Date:|head -1
+}
+
+missing() {
+  echo "==> Missing requirement: $1"
+}
+
+die() {
+  echo Can\'t continue. :\(
+  echo "$1"
+}
+
+israilsdir() {
+  [[ -e app ]]
+}
+
+fixrails() {
+  bundle install
+  rails server -d || (echo Rails won\'t start.; exit 1)
+}
+
+# Run
+main
