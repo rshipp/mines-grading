@@ -11,16 +11,24 @@ main() {
   ln -sv `pwd`/../../03/$1/* repo
   echo `pwd`/../../03/$1/* repo
   cd repo
+  git stash
+  git checkout master
   git pull
+  git submodule init
+  git submodule update --remote --merge
 
   # cd to unit04
   cd *nit*4 || cd src || cd *446/src || die "`ls`"
-  # again, just in case there are two levels
+  # again, just in case there are more levels
   cd *nit*4 || echo ignoring error
 
-
-  # run rails to check the rest
-  israilsdir || exit 1
+  # Check out the last commit before the due date.
+  git checkout `git rev-list -n 1 --before="2015-02-05 08:00 -0700" master`
+  # open the PDF
+  xdg-open *.[pP][dD][fF]
+  #
+  cd *art*2* || echo ignoring error
+  israilsdir || die "No rails app found."
   # byebug dies on 1.9.3, chuck it
   sed -i 's/^\(.*byebug\)/#\1/' Gemfile
   # make sure there's a secrets file.
@@ -33,6 +41,16 @@ EOF
   # set up signal handler
   trap int_handler INT
 
+  rake db:migrate || fixrake || exit 1
+  rake db:seed || die "Rake failed."
+  # check some files
+  echo "==> controllers/models exist"
+  ls app/{models/,controllers/}
+  echo "==> at least 3 fields, at least 2 types"
+  grep -v '^#' db/schema.rb
+  echo "==> at least 2 required"
+  grep -v '#' app/models/*.rb
+  # run rails
   rails server -d || fixrails || exit 1
   xdg-open http://localhost:3000/
 
@@ -42,11 +60,6 @@ EOF
 
 
 int_handler() {
-  echo "Interrupt detected, shutting down."
-  # check date
-  echo '==> Check the date!'
-  git log|grep Date:|head -1
-
   # kill rails
   killall ruby; sleep 0.5
   killall -9 ruby
@@ -57,15 +70,16 @@ int_handler() {
 die() {
   echo Can\'t continue. :\(
   echo "$1"
+  exit 1
 }
 
 israilsdir() {
   [[ -e app ]]
 }
 
-fixrails() {
+fixrake() {
   bundle install
-  rails server -d || (echo Rails won\'t start.; exit 1)
+  rake db:migrate || (echo Rails won\'t start.; exit 1)
 }
 
 # Run
